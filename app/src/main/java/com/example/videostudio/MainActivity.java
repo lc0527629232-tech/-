@@ -136,27 +136,31 @@ public class MainActivity extends Activity {
           }).setNegativeButton("ביטול",null).show();
     }
     private void sendAiRequest() {
-        final String text = prompt.getText().toString().trim();
+        final String promptText = prompt.getText().toString().trim();
         final String key = getPreferences(0).getString("gemini_key","");
-        if(text.length()==0){ status.setText("כתוב תיאור לסרטון"); return; }
+        if(promptText.length()==0){ status.setText("כתוב תיאור לסרטון"); return; }
         if(key.length()==0){ status.setText("תחילה הזן מפתח Gemini API בהגדרות"); return; }
-        status.setText("שולח בקשה לשירות ה-AI...");
+        status.setText("שולח בקשה ל-Gemini...");
         new Thread(new Runnable(){ public void run(){
             HttpURLConnection c=null;
             try {
-                URL u=new URL(urlText); c=(HttpURLConnection)u.openConnection();
-                c.setRequestMethod("POST"); c.setConnectTimeout(20000); c.setReadTimeout(30000);
-                c.setDoOutput(true); c.setRequestProperty("Content-Type","application/json; charset=UTF-8");
-                if(key.length()>0) c.setRequestProperty("Authorization","Bearer "+key);
-                String safe=text.replace("\\","\\\\").replace("\"","\\\"").replace("\n"," ");
-                byte[] body=("{\"prompt\":\""+safe+"\"}").getBytes("UTF-8");
+                URL u=new URL("https://generativelanguage.googleapis.com/v1beta/interactions");
+                c=(HttpURLConnection)u.openConnection();
+                c.setRequestMethod("POST");
+                c.setConnectTimeout(30000);
+                c.setReadTimeout(180000);
+                c.setDoOutput(true);
+                c.setRequestProperty("Content-Type","application/json; charset=UTF-8");
+                c.setRequestProperty("x-goog-api-key",key);
+                String safe=promptText.replace("\\\\","\\\\\\\\").replace("\\\"","\\\\\\\"").replace("\\n"," ");
+                String json="{\\\"model\\\":\\\"gemini-omni-1.1-flash\\\",\\\"input\\\":[{\\\"type\\\":\\\"text\\\",\\\"text\\\":\\\""+safe+"\\\"}],\\\"response_format\\\":[{\\\"type\\\":\\\"video\\\",\\\"delivery\\\":\\\"inline\\\"}],\\\"generation_config\\\":{\\\"video_config\\\":{\\\"task\\\":\\\"text_to_video\\\"}}}";
+                byte[] body=json.getBytes("UTF-8");
                 OutputStream out=c.getOutputStream(); out.write(body); out.close();
                 int code=c.getResponseCode();
-                final String result="Gemini החזיר קוד "+code+". אם הבקשה הצליחה, יש לבדוק את תגובת יצירת הווידאו.";
+                final String result="Gemini החזיר קוד "+code+". בדוק את תגובת השרת.";
                 runOnUiThread(new Runnable(){ public void run(){ status.setText(result); }});
             } catch(final Exception e) {
                 runOnUiThread(new Runnable(){ public void run(){ status.setText("שגיאת חיבור: "+e.getMessage()); }});
             } finally { if(c!=null)c.disconnect(); }
         }}).start();
-    }
-}
+    }}
