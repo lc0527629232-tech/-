@@ -31,6 +31,7 @@ public class MainActivity extends Activity {
     private ImageView imagePreview;
     private VideoView videoPreview;
     private TextView status;
+    private TextView previewHint;
     private EditText prompt;
     private Spinner ratioSpinner;
     private int photoIndex = 0;
@@ -112,9 +113,9 @@ public class MainActivity extends Activity {
         preview.addView(imagePreview, new FrameLayout.LayoutParams(-1, -1));
         videoPreview = new VideoView(this);
         preview.addView(videoPreview, new FrameLayout.LayoutParams(-1, -1));
-        TextView hint = label("התצוגה המקדימה תופיע כאן", 15, Color.WHITE, false);
-        hint.setGravity(Gravity.CENTER);
-        preview.addView(hint, new FrameLayout.LayoutParams(-1, -1));
+        previewHint = label("התצוגה המקדימה תופיע כאן", 15, Color.WHITE, false);
+        previewHint.setGravity(Gravity.CENTER);
+        preview.addView(previewHint, new FrameLayout.LayoutParams(-1, -1));
         Button addPhoto = actionButton("＋  הוספת תמונות");
         addPhoto.setOnClickListener(v -> pick("image/*"));
         editor.addView(addPhoto);
@@ -179,6 +180,7 @@ public class MainActivity extends Activity {
             String type = getContentResolver().getType(uri);
             if (type != null && type.startsWith("video/")) {
                 imagePreview.setVisibility(View.GONE);
+                previewHint.setVisibility(View.GONE);
                 videoPreview.setVisibility(View.VISIBLE);
                 videoPreview.setVideoURI(uri);
                 videoPreview.start();
@@ -186,6 +188,7 @@ public class MainActivity extends Activity {
             } else {
                 photos.add(uri); photoIndex = photos.size() - 1;
                 videoPreview.setVisibility(View.GONE);
+                previewHint.setVisibility(View.GONE);
                 imagePreview.setVisibility(View.VISIBLE);
                 showPhoto(photoIndex);
             }
@@ -196,6 +199,7 @@ public class MainActivity extends Activity {
         if (photos.size() == 0) { setStatus("תחילה הוסף תמונות"); return; }
         photoIndex = (photoIndex + 1) % photos.size();
         videoPreview.setVisibility(View.GONE);
+        previewHint.setVisibility(View.GONE);
         imagePreview.setVisibility(View.VISIBLE);
         showPhoto(photoIndex);
     }
@@ -327,6 +331,7 @@ public class MainActivity extends Activity {
             return;
         }
         imagePreview.setVisibility(View.GONE);
+        previewHint.setVisibility(View.GONE);
         videoPreview.setVisibility(View.VISIBLE);
         videoPreview.setVideoURI(Uri.fromFile(lastVideo));
         videoPreview.setOnPreparedListener(mp -> mp.start());
