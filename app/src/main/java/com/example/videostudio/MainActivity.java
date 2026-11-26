@@ -32,7 +32,11 @@ import javax.net.ssl.SSLSocketFactory;
 import java.util.ArrayList;
 
 public class MainActivity extends Activity {
-    private static final int PICK_MEDIA = 41;\n    private final ArrayList<Uri> videos = new ArrayList<Uri>();\n    private LinearLayout timeline;\n    private TextView countLabel;\n    private Spinner durationSpinner;
+    private static final int PICK_MEDIA = 41;
+    private final ArrayList<Uri> videos = new ArrayList<Uri>();
+    private LinearLayout timeline;
+    private TextView countLabel;
+    private Spinner durationSpinner;
     private final ArrayList<Uri> photos = new ArrayList<Uri>();
     private LinearLayout root;
     private ImageView imagePreview;
@@ -191,3 +195,23 @@ public class MainActivity extends Activity {
         });
     }
 
+    private void showNextPhoto() {
+        if(photos.size()==0){setStatus("תחילה הוסף תמונות");return;}
+        photoIndex=(photoIndex+1)%photos.size();
+        showPhoto(photoIndex);
+    }
+
+    private void showPhoto(int index) {
+        try {
+            videoPreview.setVisibility(View.GONE);
+            previewHint.setVisibility(View.GONE);
+            imagePreview.setVisibility(View.VISIBLE);
+            imagePreview.setImageURI(photos.get(index));
+            setStatus("תמונה "+(index+1)+" מתוך "+photos.size());
+        } catch(Exception e) { setStatus("לא ניתן להציג את התמונה"); }
+    }
+
+    private void setStatus(final String message) {
+        runOnUiThread(new Runnable(){ public void run(){ if(status!=null) status.setText(message); }});
+    }
+}
