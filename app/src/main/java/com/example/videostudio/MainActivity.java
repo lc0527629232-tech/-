@@ -27,7 +27,6 @@ public class MainActivity extends Activity {
     private VideoView videoPreview;
     private TextView status;
     private EditText prompt;
-    private EditText endpoint;
     private EditText apiKey;
     private int photoIndex = 0;
     private Handler handler = new Handler();
@@ -128,21 +127,19 @@ public class MainActivity extends Activity {
     }
     private void showSettings() {
         LinearLayout box = new LinearLayout(this); box.setPadding(dp(12),dp(8),dp(12),dp(8)); box.setOrientation(LinearLayout.VERTICAL);
-        endpoint = new EditText(this); endpoint.setSingleLine(true); endpoint.setHint("כתובת API מלאה (HTTPS מומלץ)");
         apiKey = new EditText(this); apiKey.setSingleLine(true); apiKey.setHint("מפתח API"); apiKey.setInputType( android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        box.addView(endpoint); box.addView(apiKey);
-        new AlertDialog.Builder(this).setTitle("הגדרות AI").setMessage("הזן נקודת קצה ומפתח של ספק יצירת וידאו התומך ב-API.").setView(box)
+        box.addView(apiKey);
+        new AlertDialog.Builder(this).setTitle("הגדרות Gemini").setMessage("הזן מפתח Gemini API מ-Google AI Studio. המפתח נשמר במכשיר זה.").setView(box)
           .setPositiveButton("שמירה", (d,w)->{
-              getPreferences(0).edit().putString("endpoint",endpoint.getText().toString().trim()).putString("key",apiKey.getText().toString().trim()).apply();
+              getPreferences(0).edit().putString("gemini_key",apiKey.getText().toString().trim()).apply();
               status.setText("ההגדרות נשמרו במכשיר");
           }).setNegativeButton("ביטול",null).show();
     }
     private void sendAiRequest() {
         final String text = prompt.getText().toString().trim();
-        final String urlText = getPreferences(0).getString("endpoint","");
-        final String key = getPreferences(0).getString("key","");
+        final String key = getPreferences(0).getString("gemini_key","");
         if(text.length()==0){ status.setText("כתוב תיאור לסרטון"); return; }
-        if(urlText.length()==0){ status.setText("תחילה הגדר כתובת API"); return; }
+        if(key.length()==0){ status.setText("תחילה הזן מפתח Gemini API בהגדרות"); return; }
         status.setText("שולח בקשה לשירות ה-AI...");
         new Thread(new Runnable(){ public void run(){
             HttpURLConnection c=null;
@@ -155,7 +152,7 @@ public class MainActivity extends Activity {
                 byte[] body=("{\"prompt\":\""+safe+"\"}").getBytes("UTF-8");
                 OutputStream out=c.getOutputStream(); out.write(body); out.close();
                 int code=c.getResponseCode();
-                final String result="השרת החזיר קוד "+code+". בדוק את תשובת הספק ואת פורמט ה-API שלו.";
+                final String result="Gemini החזיר קוד "+code+". אם הבקשה הצליחה, יש לבדוק את תגובת יצירת הווידאו.";
                 runOnUiThread(new Runnable(){ public void run(){ status.setText(result); }});
             } catch(final Exception e) {
                 runOnUiThread(new Runnable(){ public void run(){ status.setText("שגיאת חיבור: "+e.getMessage()); }});
