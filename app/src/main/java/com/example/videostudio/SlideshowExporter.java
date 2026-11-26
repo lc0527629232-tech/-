@@ -80,7 +80,7 @@ public class SlideshowExporter {
                 File mp4=new File(dir,"MySlideshow_"+System.currentTimeMillis()+".mp4");
                 Container iso=new DefaultMp4Builder().build(movie);
                 FileOutputStream fos=new FileOutputStream(mp4);
-                iso.getBox(java.nio.channels.Channels.newChannel(fos)); fos.close();
+                iso.writeContainer(java.nio.channels.Channels.newChannel(fos)); fos.close();
                 raw.delete();
                 if(callback!=null) callback.done(mp4);
             } catch(final Exception e){ if(callback!=null) callback.error(e.getMessage()==null?"שגיאה ביצירת הסרטון":e.getMessage()); }
