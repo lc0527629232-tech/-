@@ -75,8 +75,6 @@ public class MainActivity extends Activity {
 
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
-        getWindow().setStatusBarColor(Color.rgb(23, 42, 78));
-        getWindow().setNavigationBarColor(Color.rgb(23, 42, 78));
         buildUi();
     }
 
