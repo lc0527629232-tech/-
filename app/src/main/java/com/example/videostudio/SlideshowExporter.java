@@ -58,7 +58,7 @@ public class SlideshowExporter {
                     for(int f=0;f<count;f++){
                         int index;
                         while((index=codec.dequeueInputBuffer(10000))<0){}
-                        ByteBuffer input=codec.getInputBuffer(index); input.clear(); input.put(yuv);
+                        ByteBuffer input=codec.getInputBuffers()[index]; input.clear(); input.put(yuv);
                         codec.queueInputBuffer(index,0,yuv.length,pts,0); pts+=1000000/FPS;
                         drain(codec,out,info,false);
                         final int progress=(p*count+f+1)*90/total;
@@ -93,7 +93,7 @@ public class SlideshowExporter {
             if(status==MediaCodec.INFO_TRY_AGAIN_LATER){ if(!end) return; else continue; }
             if(status==MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) continue;
             if(status>=0){
-                ByteBuffer b=codec.getOutputBuffer(status);
+                ByteBuffer b=codec.getOutputBuffers()[status];
                 if(b!=null && info.size>0){ b.position(info.offset); b.limit(info.offset+info.size); byte[] bytes=new byte[info.size]; b.get(bytes); out.write(bytes); }
                 boolean done=(info.flags&MediaCodec.BUFFER_FLAG_END_OF_STREAM)!=0;
                 codec.releaseOutputBuffer(status,false);
