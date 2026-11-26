@@ -152,8 +152,8 @@ public class MainActivity extends Activity {
                 c.setDoOutput(true);
                 c.setRequestProperty("Content-Type","application/json; charset=UTF-8");
                 c.setRequestProperty("x-goog-api-key",key);
-                String safe=promptText.replace("\\\\","\\\\\\\\").replace("\\\"","\\\\\\\"").replace("\\n"," ");
-                String json="{\\\"model\\\":\\\"gemini-omni-1.1-flash\\\",\\\"input\\\":[{\\\"type\\\":\\\"text\\\",\\\"text\\\":\\\""+safe+"\\\"}],\\\"response_format\\\":[{\\\"type\\\":\\\"video\\\",\\\"delivery\\\":\\\"inline\\\"}],\\\"generation_config\\\":{\\\"video_config\\\":{\\\"task\\\":\\\"text_to_video\\\"}}}";
+                String safe=promptText.replace("\\","\\\\").replace("\"","\\\"").replace("\n"," ");
+                String json="{\"model\":\"gemini-omni-1.1-flash\",\"input\":[{\"type\":\"text\",\"text\":\""+safe+"\"}],\"response_format\":[{\"type\":\"video\",\"delivery\":\"inline\"}],\"generation_config\":{\"video_config\":{\"task\":\"text_to_video\"}}}";
                 byte[] body=json.getBytes("UTF-8");
                 OutputStream out=c.getOutputStream(); out.write(body); out.close();
                 int code=c.getResponseCode();
@@ -163,4 +163,5 @@ public class MainActivity extends Activity {
                 runOnUiThread(new Runnable(){ public void run(){ status.setText("שגיאת חיבור: "+e.getMessage()); }});
             } finally { if(c!=null)c.disconnect(); }
         }}).start();
-    }}
+    }
+}}
