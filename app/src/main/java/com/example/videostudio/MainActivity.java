@@ -32,7 +32,7 @@ import javax.net.ssl.SSLSocketFactory;
 import java.util.ArrayList;
 
 public class MainActivity extends Activity {
-    private static final int PICK_MEDIA = 41;
+    private static final int PICK_MEDIA = 41;\n    private final ArrayList<Uri> videos = new ArrayList<Uri>();\n    private LinearLayout timeline;\n    private TextView countLabel;\n    private Spinner durationSpinner;
     private final ArrayList<Uri> photos = new ArrayList<Uri>();
     private LinearLayout root;
     private ImageView imagePreview;
@@ -73,10 +73,10 @@ public class MainActivity extends Activity {
         LinearLayout card = new LinearLayout(this);
         card.setOrientation(LinearLayout.VERTICAL);
         card.setPadding(dp(14), dp(10), dp(14), dp(12));
-        card.setBackground(shape(Color.WHITE, 18));
+        card.setBackground(shape(Color.rgb(25,34,54), 18));
         LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(-1, -2);
         p.setMargins(0, dp(8), 0, dp(8)); root.addView(card, p);
-        TextView h = label(heading, 19, Color.rgb(28, 48, 83), true);
+        TextView h = label(heading, 19, Color.rgb(235,242,255), true);
         card.addView(h);
         return card;
     }
@@ -91,298 +91,103 @@ public class MainActivity extends Activity {
         scroll.setFillViewport(true);
         root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
-        root.setPadding(dp(16), dp(12), dp(16), dp(22));
-        root.setBackgroundColor(Color.rgb(239, 243, 250));
-        scroll.addView(root);
-        setContentView(scroll);
+        root.setPadding(dp(16), dp(14), dp(16), dp(24));
+        root.setBackgroundColor(Color.rgb(12,18,32));
+        scroll.addView(root); setContentView(scroll);
 
         LinearLayout hero = new LinearLayout(this);
-        hero.setOrientation(LinearLayout.VERTICAL);
-        hero.setGravity(Gravity.CENTER);
-        hero.setPadding(dp(16), dp(18), dp(16), dp(18));
-        hero.setBackground(shape(Color.rgb(23, 42, 78), 20));
-        root.addView(hero);
-        TextView title = label("סטודיו וידאו", 27, Color.WHITE, true);
-        title.setGravity(Gravity.CENTER);
-        hero.addView(title);
-        TextView subtitle = label("יוצרים סרטונים בקלות בעזרת Gemini", 14, Color.rgb(220,230,250), false);
-        subtitle.setGravity(Gravity.CENTER);
-        hero.addView(subtitle);
+        hero.setOrientation(LinearLayout.VERTICAL); hero.setGravity(Gravity.CENTER);
+        hero.setPadding(dp(18),dp(22),dp(18),dp(22));
+        hero.setBackground(shape(Color.rgb(29,43,75),22)); root.addView(hero);
+        TextView title=label("STUDIO  •  סטודיו וידאו",26,Color.WHITE,true); title.setGravity(Gravity.CENTER); hero.addView(title);
+        TextView sub=label("הסרט שלך. התמונות שלך. היצירה שלך.",14,Color.rgb(190,208,240),false); sub.setGravity(Gravity.CENTER); hero.addView(sub);
 
-        LinearLayout editor = section("🎞  עורך המדיה שלי");
-        FrameLayout preview = new FrameLayout(this);
-        preview.setBackground(shape(Color.rgb(16, 22, 34), 14));
-        LinearLayout.LayoutParams pp = new LinearLayout.LayoutParams(-1, dp(205));
-        pp.setMargins(0, dp(5), 0, dp(8));
-        editor.addView(preview, pp);
-        imagePreview = new ImageView(this);
-        imagePreview.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        preview.addView(imagePreview, new FrameLayout.LayoutParams(-1, -1));
-        videoPreview = new VideoView(this);
-        preview.addView(videoPreview, new FrameLayout.LayoutParams(-1, -1));
-        previewHint = label("התצוגה המקדימה תופיע כאן", 15, Color.WHITE, false);
-        previewHint.setGravity(Gravity.CENTER);
-        preview.addView(previewHint, new FrameLayout.LayoutParams(-1, -1));
-        Button addPhoto = actionButton("＋  הוספת תמונות");
-        addPhoto.setOnClickListener(v -> pick("image/*"));
-        editor.addView(addPhoto);
-        Button addVideo = actionButton("▶  פתיחת סרטון מהמכשיר");
-        addVideo.setOnClickListener(v -> pick("video/*"));
-        editor.addView(addVideo);
-        Button next = actionButton("התמונה הבאה");
-        next.setOnClickListener(v -> showNextPhoto());
-        editor.addView(next);
-        Button playLast = actionButton("▶  הפעלת סרטון AI אחרון");
-        playLast.setOnClickListener(v -> playLastVideo());
-        editor.addView(playLast);
+        LinearLayout editor=section("🎬  סביבת העריכה");
+        editor.setBackground(shape(Color.rgb(25,34,54),20));
+        FrameLayout preview=new FrameLayout(this); preview.setBackground(shape(Color.rgb(5,9,17),16));
+        LinearLayout.LayoutParams pp=new LinearLayout.LayoutParams(-1,dp(210)); pp.setMargins(0,dp(8),0,dp(10)); editor.addView(preview,pp);
+        imagePreview=new ImageView(this); imagePreview.setScaleType(ImageView.ScaleType.FIT_CENTER); preview.addView(imagePreview,new FrameLayout.LayoutParams(-1,-1));
+        videoPreview=new VideoView(this); preview.addView(videoPreview,new FrameLayout.LayoutParams(-1,-1));
+        previewHint=label("הוסף תמונות או סרטונים כדי להתחיל",15,Color.WHITE,false); previewHint.setGravity(Gravity.CENTER); preview.addView(previewHint,new FrameLayout.LayoutParams(-1,-1));
 
-        LinearLayout ai = section("✨  יצירת סרטון עם Gemini");
-        TextView info = label("תאר במילים את הסרטון שתרצה. Gemini ייצור עבורך קליפ וידאו קצר.", 13, Color.DKGRAY, false);
-        ai.addView(info);
-        prompt = new EditText(this);
-        prompt.setTextSize(15);
-        prompt.setGravity(Gravity.TOP | Gravity.RIGHT);
-        prompt.setMinLines(4);
-        prompt.setPadding(dp(12), dp(10), dp(12), dp(10));
-        prompt.setHint("לדוגמה: צילום קולנועי של מכונית ספורט נוסעת בכביש הררי בשקיעה...");
-        prompt.setBackground(shape(Color.rgb(246,248,252), 12));
-        ai.addView(prompt, new LinearLayout.LayoutParams(-1, dp(112)));
+        Button addPhoto=actionButton("＋  הוספת תמונות"); addPhoto.setOnClickListener(v->pick("image/*")); editor.addView(addPhoto);
+        Button addVideo=actionButton("▶  הוספת סרטונים"); addVideo.setOnClickListener(v->pick("video/*")); editor.addView(addVideo);
+        countLabel=label("עדיין לא נוספו פריטים",13,Color.rgb(190,205,230),true); editor.addView(countLabel);
+        timeline=new LinearLayout(this); timeline.setOrientation(LinearLayout.HORIZONTAL);
+        HorizontalScrollView strip=new HorizontalScrollView(this); strip.setHorizontalScrollBarEnabled(false);
+        strip.addView(timeline); editor.addView(strip,new LinearLayout.LayoutParams(-1,dp(112)));
+        Button next=actionButton("הבא בתצוגה"); next.setOnClickListener(v->showNextPhoto()); editor.addView(next);
 
-        TextView ratioLabel = label("פורמט הסרטון", 14, Color.rgb(45,55,75), true);
-        ai.addView(ratioLabel);
-        ratioSpinner = new Spinner(this);
-        String[] ratios = new String[] {"רחב 16:9", "אנכי 9:16"};
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, ratios);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        ratioSpinner.setAdapter(adapter);
-        ai.addView(ratioSpinner, new LinearLayout.LayoutParams(-1, dp(48)));
-
-        Button settings = actionButton("⚙  הגדרת מפתח Gemini");
-        settings.setOnClickListener(v -> showSettings());
-        ai.addView(settings);
-        Button generate = actionButton("✨  צור לי סרטון");
-        generate.setBackground(shape(Color.rgb(20, 145, 112), 14));
-        generate.setOnClickListener(v -> generateVideo());
-        ai.addView(generate);
-
-        status = label("מוכן ליצירה", 14, Color.rgb(35, 105, 78), true);
-        status.setGravity(Gravity.CENTER);
-        status.setBackground(shape(Color.rgb(232, 247, 240), 12));
-        ai.addView(status);
-        TextView note = label("יצירת וידאו דורשת מפתח Gemini API וזמינות/חיוב מתאימים בחשבון Google. הסרטון נשמר בתיקיית Movies במכשיר.", 12, Color.DKGRAY, false);
-        ai.addView(note);
+        LinearLayout export=section("✨  יצירת סרטון MP4");
+        export.setBackground(shape(Color.rgb(25,34,54),20));
+        TextView help=label("בחר כמה שניות להציג כל תמונה, ואז צור סרטון ושמור אותו בתיקיית Movies.",14,Color.rgb(220,228,244),false); export.addView(help);
+        durationSpinner=new Spinner(this);
+        String[] durations={"3 שניות לכל תמונה","5 שניות לכל תמונה","7 שניות לכל תמונה"};
+        ArrayAdapter<String> adapter=new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,durations);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); durationSpinner.setAdapter(adapter);
+        export.addView(durationSpinner,new LinearLayout.LayoutParams(-1,dp(48)));
+        Button make=actionButton("▶  יצירת סרטון MP4"); make.setBackground(shape(Color.rgb(0,160,125),15));
+        make.setOnClickListener(v->exportSlideshow()); export.addView(make);
+        status=label("מוכן לעריכה",14,Color.rgb(120,230,190),true); status.setGravity(Gravity.CENTER);
+        status.setBackground(shape(Color.rgb(25,66,62),12)); export.addView(status);
+        TextView foot=label("היצירה מתבצעת במכשיר ללא Gemini וללא חיבור לאינטרנט. בשלב זה הייצוא כולל תמונות; סרטונים שמוסיפים ניתנים לתצוגה אך עדיין אינם משולבים בקובץ הסופי.",12,Color.rgb(180,194,218),false); export.addView(foot);
     }
-
     private void pick(String type) {
-        Intent i = new Intent(Intent.ACTION_GET_CONTENT);
-        i.setType(type); i.addCategory(Intent.CATEGORY_OPENABLE);
-        try { startActivityForResult(Intent.createChooser(i, "בחירת קובץ"), PICK_MEDIA); }
-        catch (Exception e) { setStatus("לא ניתן לפתוח את בורר הקבצים"); }
+        Intent i=new Intent(Intent.ACTION_GET_CONTENT); i.setType(type);
+        i.putExtra(Intent.EXTRA_ALLOW_MULTIPLE,true); i.addCategory(Intent.CATEGORY_OPENABLE);
+        try { startActivityForResult(Intent.createChooser(i,"בחירת קבצים"),PICK_MEDIA); }
+        catch(Exception e){setStatus("לא ניתן לפתוח את בורר הקבצים");}
     }
 
-    @Override protected void onActivityResult(int request, int result, Intent data) {
-        super.onActivityResult(request, result, data);
-        if (request == PICK_MEDIA && result == RESULT_OK && data != null && data.getData() != null) {
-            Uri uri = data.getData();
-            String type = getContentResolver().getType(uri);
-            if (type != null && type.startsWith("video/")) {
-                imagePreview.setVisibility(View.GONE);
-                previewHint.setVisibility(View.GONE);
-                videoPreview.setVisibility(View.VISIBLE);
-                videoPreview.setVideoURI(uri);
-                videoPreview.start();
-                setStatus("הסרטון נטען ומנגן");
-            } else {
-                photos.add(uri); photoIndex = photos.size() - 1;
-                videoPreview.setVisibility(View.GONE);
-                previewHint.setVisibility(View.GONE);
-                imagePreview.setVisibility(View.VISIBLE);
-                showPhoto(photoIndex);
-            }
+    @Override protected void onActivityResult(int request,int result,Intent data) {
+        super.onActivityResult(request,result,data);
+        if(request!=PICK_MEDIA || result!=RESULT_OK || data==null) return;
+        if(data.getClipData()!=null) {
+            for(int i=0;i<data.getClipData().getItemCount();i++) addMedia(data.getClipData().getItemAt(i).getUri());
+        } else if(data.getData()!=null) addMedia(data.getData());
+        refreshTimeline();
+    }
+
+    private void addMedia(Uri uri) {
+        String type=getContentResolver().getType(uri);
+        if(type!=null && type.startsWith("video/")) videos.add(uri);
+        else { photos.add(uri); photoIndex=photos.size()-1; showPhoto(photoIndex); }
+    }
+
+    private void refreshTimeline() {
+        timeline.removeAllViews();
+        for(int i=0;i<photos.size();i++) {
+            final int index=i;
+            LinearLayout tile=new LinearLayout(this); tile.setOrientation(LinearLayout.VERTICAL);
+            tile.setPadding(dp(5),dp(5),dp(5),dp(5)); tile.setBackground(shape(Color.rgb(43,57,82),12));
+            LinearLayout.LayoutParams tp=new LinearLayout.LayoutParams(dp(92),dp(100)); tp.setMargins(dp(3),dp(4),dp(3),dp(4)); timeline.addView(tile,tp);
+            ImageView thumb=new ImageView(this); thumb.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            try{thumb.setImageURI(photos.get(i));}catch(Exception ignored){}
+            tile.addView(thumb,new LinearLayout.LayoutParams(-1,dp(62)));
+            TextView num=label("תמונה "+(i+1),11,Color.WHITE,true); num.setGravity(Gravity.CENTER); tile.addView(num);
+            tile.setOnClickListener(v->{photoIndex=index;showPhoto(index);});
         }
-    }
-
-    private void showNextPhoto() {
-        if (photos.size() == 0) { setStatus("תחילה הוסף תמונות"); return; }
-        photoIndex = (photoIndex + 1) % photos.size();
-        videoPreview.setVisibility(View.GONE);
-        previewHint.setVisibility(View.GONE);
-        imagePreview.setVisibility(View.VISIBLE);
-        showPhoto(photoIndex);
-    }
-
-    private void showPhoto(int index) {
-        try {
-            imagePreview.setImageURI(photos.get(index));
-            setStatus("תמונה " + (index + 1) + " מתוך " + photos.size());
-        } catch (Exception e) { setStatus("לא ניתן להציג את התמונה"); }
-    }
-
-    private void showSettings() {
-        final EditText keyInput = new EditText(this);
-        keyInput.setSingleLine(true);
-        keyInput.setHint("הדבק כאן מפתח Gemini API");
-        keyInput.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        String saved = getPreferences(0).getString("gemini_key", "");
-        keyInput.setText(saved);
-        LinearLayout box = new LinearLayout(this);
-        box.setPadding(dp(14), dp(8), dp(14), dp(4));
-        box.addView(keyInput);
-        new AlertDialog.Builder(this)
-            .setTitle("חיבור ל-Gemini")
-            .setMessage("המפתח נשמר במכשיר בלבד. אל תשתף אותו עם אחרים.")
-            .setView(box)
-            .setPositiveButton("שמירה", (d, w) -> {
-                getPreferences(0).edit().putString("gemini_key", keyInput.getText().toString().trim()).apply();
-                setStatus("מפתח Gemini נשמר");
-            })
-            .setNegativeButton("ביטול", null).show();
-    }
-
-    private void setStatus(final String message) {
-        runOnUiThread(new Runnable() { public void run() { status.setText(message); }});
-    }
-
-    private void generateVideo() {
-        final String text = prompt.getText().toString().trim();
-        final String key = getPreferences(0).getString("gemini_key", "");
-        if (text.length() == 0) { setStatus("כתוב תיאור לסרטון"); return; }
-        if (key.length() == 0) { setStatus("תחילה הגדר מפתח Gemini"); return; }
-        final String ratio = ratioSpinner.getSelectedItemPosition() == 1 ? "9:16" : "16:9";
-        setStatus("Gemini יוצר את הסרטון... זה עשוי להימשך מספר דקות");
-        new Thread(new Runnable() { public void run() {
-            HttpURLConnection c = null;
-            try {
-                URL url = new URL("https://generativelanguage.googleapis.com/v1beta/interactions");
-                c = (HttpURLConnection) url.openConnection();
-                if (c instanceof HttpsURLConnection) {
-                    ((HttpsURLConnection)c).setSSLSocketFactory(new Tls12SocketFactory((SSLSocketFactory)SSLSocketFactory.getDefault()));
-                }
-                c.setRequestMethod("POST");
-                c.setConnectTimeout(45000);
-                c.setReadTimeout(360000);
-                c.setDoOutput(true);
-                c.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-                c.setRequestProperty("x-goog-api-key", key);
-                JSONObject body = new JSONObject();
-                body.put("model", "gemini-omni-1.1-flash");
-                body.put("input", text);
-                JSONObject format = new JSONObject();
-                format.put("type", "video");
-                format.put("aspect_ratio", ratio);
-                format.put("resolution", "720p");
-                body.put("response_format", format);
-                OutputStream out = c.getOutputStream();
-                out.write(body.toString().getBytes("UTF-8"));
-                out.flush(); out.close();
-
-                int code = c.getResponseCode();
-                InputStream stream = code >= 200 && code < 300 ? c.getInputStream() : c.getErrorStream();
-                String response = readAll(stream);
-                if (code < 200 || code >= 300) {
-                    JSONObject err = new JSONObject(response);
-                    String msg = err.optJSONObject("error") != null ? err.getJSONObject("error").optString("message", response) : response;
-                    throw new Exception("שגיאת Gemini (" + code + "): " + msg);
-                }
-
-                JSONObject result = new JSONObject(response);
-                String videoData = findVideoData(result);
-                if (videoData == null || videoData.length() == 0) {
-                    String state = result.optString("status", "לא ידוע");
-                    throw new Exception("הבקשה הסתיימה אך לא נמצא קובץ וידאו בתשובה. מצב: " + state);
-                }
-                byte[] bytes = Base64.decode(videoData, Base64.DEFAULT);
-                File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES);
-                if (!dir.exists() && !dir.mkdirs()) throw new Exception("לא ניתן ליצור תיקיית Movies");
-                File file = new File(dir, "GeminiVideo_" + System.currentTimeMillis() + ".mp4");
-                FileOutputStream fos = new FileOutputStream(file);
-                fos.write(bytes); fos.flush(); fos.close();
-                lastVideo = file;
-                setStatus("הסרטון מוכן ונשמר: Movies/" + file.getName());
-                runOnUiThread(new Runnable() { public void run() { playLastVideo(); }});
-            } catch (final Exception e) {
-                setStatus("לא הצלחנו ליצור סרטון: " + e.getMessage());
-            } finally { if (c != null) c.disconnect(); }
-        }}).start();
-    }
-
-    private String findVideoData(JSONObject response) throws Exception {
-        JSONArray steps = response.optJSONArray("steps");
-        if (steps == null) return null;
-        for (int i = 0; i < steps.length(); i++) {
-            JSONObject step = steps.optJSONObject(i);
-            if (step == null || !"model_output".equals(step.optString("type"))) continue;
-            JSONArray content = step.optJSONArray("content");
-            if (content == null) continue;
-            for (int j = 0; j < content.length(); j++) {
-                JSONObject item = content.optJSONObject(j);
-                if (item != null && "video".equals(item.optString("type"))) {
-                    String data = item.optString("data", "");
-                    if (data.length() > 0) return data;
-                }
-            }
+        for(int i=0;i<videos.size();i++) {
+            final Uri uri=videos.get(i);
+            LinearLayout tile=new LinearLayout(this); tile.setOrientation(LinearLayout.VERTICAL); tile.setGravity(Gravity.CENTER);
+            tile.setPadding(dp(5),dp(5),dp(5),dp(5)); tile.setBackground(shape(Color.rgb(65,48,78),12));
+            LinearLayout.LayoutParams tp=new LinearLayout.LayoutParams(dp(92),dp(100)); tp.setMargins(dp(3),dp(4),dp(3),dp(4)); timeline.addView(tile,tp);
+            TextView icon=label("▶",30,Color.WHITE,true); icon.setGravity(Gravity.CENTER); tile.addView(icon,new LinearLayout.LayoutParams(-1,dp(62)));
+            TextView num=label("סרטון "+(i+1),11,Color.WHITE,true); num.setGravity(Gravity.CENTER); tile.addView(num);
+            tile.setOnClickListener(v->{imagePreview.setVisibility(View.GONE);previewHint.setVisibility(View.GONE);videoPreview.setVisibility(View.VISIBLE);videoPreview.setVideoURI(uri);videoPreview.start();});
         }
-        return null;
+        countLabel.setText("ברצועה: "+photos.size()+" תמונות  •  "+videos.size()+" סרטונים");
+        setStatus("המדיה נוספה לרצועת השקופיות");
     }
 
-    private String readAll(InputStream input) throws Exception {
-        if (input == null) return "";
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        byte[] buffer = new byte[8192];
-        int n;
-        while ((n = input.read(buffer)) != -1) out.write(buffer, 0, n);
-        input.close();
-        return new String(out.toByteArray(), "UTF-8");
+    private void exportSlideshow() {
+        if(photos.size()==0){setStatus("כדי ליצור MP4 הוסף לפחות תמונה אחת");return;}
+        final int seconds=durationSpinner.getSelectedItemPosition()==0?3:durationSpinner.getSelectedItemPosition()==1?5:7;
+        setStatus("מכין סרטון MP4... נא להמתין");
+        SlideshowExporter.export(this,new ArrayList<Uri>(photos),seconds,new SlideshowExporter.Callback(){
+            public void progress(final int p){setStatus("יוצר סרטון... "+p+"%");}
+            public void done(final File file){setStatus("הסרטון נשמר ב-Movies: "+file.getName());runOnUiThread(()->{imagePreview.setVisibility(View.GONE);previewHint.setVisibility(View.GONE);videoPreview.setVisibility(View.VISIBLE);videoPreview.setVideoURI(Uri.fromFile(file));videoPreview.setOnPreparedListener(mp->mp.start());});}
+            public void error(final String message){setStatus("לא ניתן ליצור MP4: "+message);}
+        });
     }
 
-
-    private static class Tls12SocketFactory extends SSLSocketFactory {
-        private final SSLSocketFactory delegate;
-        Tls12SocketFactory(SSLSocketFactory factory) { delegate = factory; }
-        private Socket enableTls12(Socket socket) {
-            if (socket instanceof SSLSocket) {
-                SSLSocket ssl = (SSLSocket) socket;
-                try {
-                    String[] supported = ssl.getSupportedProtocols();
-                    for (String protocol : supported) {
-                        if ("TLSv1.2".equals(protocol)) {
-                            ssl.setEnabledProtocols(new String[] {"TLSv1.2"});
-                            break;
-                        }
-                    }
-                } catch (Exception ignored) { }
-            }
-            return socket;
-        }
-        public String[] getDefaultCipherSuites() { return delegate.getDefaultCipherSuites(); }
-        public String[] getSupportedCipherSuites() { return delegate.getSupportedCipherSuites(); }
-        public Socket createSocket(Socket s, String host, int port, boolean autoClose) throws IOException {
-            return enableTls12(delegate.createSocket(s, host, port, autoClose));
-        }
-        public Socket createSocket(String host, int port) throws IOException, UnknownHostException {
-            return enableTls12(delegate.createSocket(host, port));
-        }
-        public Socket createSocket(String host, int port, InetAddress local, int localPort) throws IOException, UnknownHostException {
-            return enableTls12(delegate.createSocket(host, port, local, localPort));
-        }
-        public Socket createSocket(InetAddress host, int port) throws IOException {
-            return enableTls12(delegate.createSocket(host, port));
-        }
-        public Socket createSocket(InetAddress address, int port, InetAddress local, int localPort) throws IOException {
-            return enableTls12(delegate.createSocket(address, port, local, localPort));
-        }
-    }
-
-    private void playLastVideo() {
-        if (lastVideo == null || !lastVideo.exists()) {
-            setStatus("עדיין לא נוצר סרטון AI במכשיר");
-            return;
-        }
-        imagePreview.setVisibility(View.GONE);
-        previewHint.setVisibility(View.GONE);
-        videoPreview.setVisibility(View.VISIBLE);
-        videoPreview.setVideoURI(Uri.fromFile(lastVideo));
-        videoPreview.setOnPreparedListener(mp -> mp.start());
-        setStatus("מנגן את הסרטון שנוצר");
-    }
-}
