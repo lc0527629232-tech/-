@@ -14,12 +14,12 @@ android {
         versionName '1.0'
     }
 
-    dependencies {
-        implementation 'com.googlecode.mp4parser:isoparser:1.1.22'
-    }
-
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+}
+
+dependencies {
+    implementation 'com.googlecode.mp4parser:isoparser:1.1.22'
 }
